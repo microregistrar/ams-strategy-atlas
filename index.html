@@ -5,3 +5,2055 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AMS Strategy Atlas — Interactive Learning Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1815;
+    --paper: #f4efe6;
+    --paper-warm: #ede5d3;
+    --accent: #b8441f;
+    --accent-soft: #d96a40;
+    --sage: #6b7d5a;
+    --ochre: #c8932b;
+    --slate: #4a5568;
+    --border: #1a1815;
+    --muted: #6b6456;
+    --evidence-high: #2d5a3d;
+    --evidence-mod: #c8932b;
+    --evidence-low: #b8441f;
+    --evidence-emerging: #6b4a7a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter Tight', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(184,68,31,0.03) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(107,125,90,0.04) 0%, transparent 50%);
+  }
+
+  header.masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: 32px 48px 24px;
+    background: var(--paper-warm);
+    position: relative;
+  }
+
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .masthead-top .pill {
+    padding: 3px 10px;
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  h1.title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(38px, 5vw, 62px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  h1.title .italic { font-style: italic; font-weight: 400; color: var(--accent); }
+
+  .subtitle {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--slate);
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--ink);
+    padding-top: 16px;
+  }
+  .nav-tab {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 10px 20px;
+    border: 1px solid var(--ink);
+    border-right: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--ink);
+  }
+  .nav-tab:last-child { border-right: 1px solid var(--ink); }
+  .nav-tab:hover { background: var(--paper); }
+  .nav-tab.active { background: var(--ink); color: var(--paper); }
+
+  main { padding: 40px 48px 80px; max-width: 1600px; margin: 0 auto; }
+
+  /* ===== ATLAS VIEW ===== */
+  .atlas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .atlas-intro { max-width: 640px; }
+  .atlas-intro h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .atlas-intro p { font-size: 14px; color: var(--slate); }
+
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+  .filter-chip {
+    padding: 6px 12px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+  .filter-chip:hover { background: var(--paper-warm); }
+  .filter-chip.active { background: var(--ink); color: var(--paper); }
+
+  .search-box {
+    padding: 8px 14px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    width: 240px;
+  }
+
+  .family-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0;
+    border: 1px solid var(--ink);
+  }
+
+  .family-card {
+    padding: 24px 22px;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .family-card:hover { background: var(--paper-warm); }
+
+  .family-letter {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--accent);
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    opacity: 0.9;
+  }
+  .family-card:hover .family-letter { color: var(--ink); }
+
+  .family-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .family-name {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: 10px;
+    padding-right: 50px;
+  }
+  .family-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .family-meta .count { color: var(--accent); font-weight: 700; }
+
+  /* ===== SUBTOPIC VIEW ===== */
+  .subtopic-view { display: none; }
+  .subtopic-view.active { display: block; }
+
+  .breadcrumb {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    cursor: pointer;
+  }
+  .breadcrumb:hover { color: var(--accent); }
+  .breadcrumb::before { content: "← "; }
+
+  .family-header {
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 24px;
+    margin-bottom: 28px;
+  }
+  .family-header h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .family-header h2 .letter {
+    color: var(--accent);
+    font-weight: 800;
+    margin-right: 12px;
+  }
+  .family-header .description {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--slate);
+    max-width: 780px;
+  }
+
+  .strategy-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 14px;
+  }
+  .strategy-card {
+    padding: 18px 20px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .strategy-card:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .strategy-card:hover .strategy-tag { color: var(--paper); opacity: 0.6; }
+  .strategy-card:hover .evidence-dot { border-color: var(--paper); }
+
+  .strategy-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .strategy-name {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .strategy-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .evidence-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    border: 1px solid transparent;
+  }
+  .evidence-high { background: var(--evidence-high); }
+  .evidence-mod { background: var(--evidence-mod); }
+  .evidence-low { background: var(--evidence-low); }
+  .evidence-emerging { background: var(--evidence-emerging); }
+
+  /* ===== DETAIL MODAL ===== */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26,24,21,0.7);
+    z-index: 100;
+    backdrop-filter: blur(4px);
+  }
+  .modal-backdrop.active { display: flex; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+
+  .modal {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    max-width: 820px;
+    width: 100%;
+    position: relative;
+    box-shadow: 12px 12px 0 var(--ink);
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    color: var(--ink);
+    padding: 4px 10px;
+    border: 1px solid var(--ink);
+  }
+  .modal-close:hover { background: var(--ink); color: var(--paper); }
+
+  .modal-header {
+    padding: 30px 36px 20px;
+    border-bottom: 1px solid var(--ink);
+    background: var(--paper-warm);
+  }
+  .modal-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    padding-right: 80px;
+  }
+  .modal-oneliner {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--slate);
+  }
+
+  .modal-body { padding: 28px 36px 32px; }
+
+  .section-block { margin-bottom: 24px; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .section-content { font-size: 14.5px; line-height: 1.6; }
+  .section-content p { margin-bottom: 8px; }
+
+  .evidence-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 10px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+  .evidence-badge.high { background: var(--evidence-high); color: var(--paper); border-color: var(--evidence-high); }
+  .evidence-badge.mod { background: var(--evidence-mod); color: var(--ink); border-color: var(--evidence-mod); }
+  .evidence-badge.low { background: var(--evidence-low); color: var(--paper); border-color: var(--evidence-low); }
+  .evidence-badge.emerging { background: var(--evidence-emerging); color: var(--paper); border-color: var(--evidence-emerging); }
+
+  .source-list { list-style: none; }
+  .source-list li {
+    padding: 4px 0 4px 18px;
+    font-size: 13px;
+    position: relative;
+  }
+  .source-list li::before {
+    content: "§";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+  }
+
+  .settings-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .setting-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 3px 9px;
+    background: var(--paper-warm);
+    border: 1px solid var(--ink);
+  }
+
+  /* ===== HOSPITAL MATCH VIEW ===== */
+  .match-view { display: none; }
+  .match-view.active { display: block; }
+
+  .match-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 32px;
+  }
+  .match-intro h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 12px;
+  }
+  .match-intro h2 .italic { font-style: italic; color: var(--accent); }
+  .match-intro p { font-size: 15px; color: var(--slate); line-height: 1.6; }
+
+  .profile-form {
+    border: 1px solid var(--ink);
+    padding: 28px 32px;
+    background: var(--paper-warm);
+  }
+  .form-field { margin-bottom: 20px; }
+  .form-field label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .form-field label .hint {
+    font-family: 'Inter Tight', sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--muted);
+    font-weight: 400;
+    margin-left: 6px;
+    font-size: 11px;
+  }
+
+  .option-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 6px;
+  }
+  .option-chip {
+    padding: 8px 12px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    cursor: pointer;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .option-chip:hover { background: var(--paper-warm); }
+  .option-chip.selected {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  textarea.free-text {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 14px;
+    min-height: 90px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  .analyze-btn {
+    margin-top: 8px;
+    padding: 14px 28px;
+    background: var(--accent);
+    color: var(--paper);
+    border: 1px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .analyze-btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+  .analyze-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+
+  .results-section {
+    margin-top: 40px;
+    display: none;
+  }
+  .results-section.active { display: block; }
+
+  .results-header {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .results-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--slate);
+    margin-bottom: 20px;
+    font-size: 15px;
+  }
+
+ottom: 28px; }
+  .grade-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 8px 14px;
+    border-top: 2px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .grade-header.a { background: var(--ink); color: var(--paper); }
+  .grade-header.b { background: var(--paper-warm); }
+  .grade-header.c { background: var(--paper); }
+
+  .grade-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    opacity: 0.7;
+  }
+
+  .match-card {
+    border: 1px solid var(--ink);
+    padding: 16px 20px;
+    margin-bottom: 8px;
+    background: var(--paper);
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .match-card:hover { background: var(--paper-warm); }
+  .match-score {
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--accent);
+    text-align: center;
+  }
+  .match-info { }
+  .match-name {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .match-reason {
+    font-size: 12.5px;
+    color: var(--slate);
+    font-style: italic;
+  }
+  .match-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .footer-note {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* ===== LEGEND ===== */
+  .legend {
+    display: flex;
+    gap: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+
+  /* ===== CAVEAT BANNER ===== */
+  .caveat-banner {
+    background: var(--accent);
+    color: var(--paper);
+    padding: 10px 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .caveat-banner::before {
+    content: "⚠";
+    font-size: 16px;
+    font-family: 'Fraunces', serif;
+  }
+  .caveat-banner strong { font-weight: 700; }
+
+  /* ===== ATTRIBUTION ===== */
+  .attribution {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .attribution .by {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+  .attribution .author {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .attribution .dot {
+    width: 3px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 50%;
+  }
+  .attribution .platform {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ===== LLM NARRATIVE ===== */
+  .narrative-panel {
+    margin-top: 24px;
+    margin-bottom: 32px;
+    padding: 24px 28px;
+    border: 1px solid var(--ink);
+    background: linear-gradient(135deg, var(--paper-warm) 0%, var(--paper) 100%);
+    position: relative;
+  }
+  .narrative-panel::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+  }
+  .narrative-header {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .narrative-header .ai-tag {
+    padding: 3px 8px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 9px;
+  }
+  .narrative-content {
+    font-family: 'Fraunces', serif;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .narrative-content p { margin-bottom: 10px; }
+  .narrative-content strong { font-weight: 600; color: var(--accent); }
+  .narrative-loading {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .narrative-loading::after {
+    content: "…";
+    animation: dots 1.4s infinite;
+    display: inline-block;
+  }
+  @keyframes dots {
+    0%, 20% { content: ""; }
+    40% { content: "."; }
+    60% { content: ".."; }
+    80%, 100% { content: "..."; }
+  }
+  .narrative-error {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    header.masthead { padding: 20px 20px 16px; }
+    .caveat-banner { padding: 10px 20px; font-size: 10px; letter-spacing: 1px; }
+    main { padding: 24px 20px 60px; }
+    h1.title { font-size: 34px; }
+    .match-intro { grid-template-columns: 1fr; gap: 24px; }
+    .modal { box-shadow: 6px 6px 0 var(--ink); }
+    .modal-header, .modal-body { padding-left: 22px; padding-right: 22px; }
+    .modal-title { font-size: 24px; padding-right: 60px; }
+    .attribution { flex-wrap: wrap; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="caveat-banner">
+  <span><strong>Educational tool only.</strong> All recommendations must be reviewed by a qualified AMS expert before clinical or policy use.</span>
+</div>
+
+<header class="masthead">
+  <div class="masthead-top">
+    <span>§ Antimicrobial Stewardship</span>
+    <span class="pill">Educational Atlas v1.0</span>
+    <div class="attribution">
+      <span class="by">By</span>
+      <span class="author">Dr Suryabrata Banerjee</span>
+      <span class="dot"></span>
+      <span class="platform">microregistrar.com</span>
+    </div>
+  </div>
+  <h1 class="title">The Stewardship <span class="italic">Atlas</span></h1>
+  <p class="subtitle">A navigable map of named AMS strategies — from preauthorisation to phage stewardship — with mechanism, evidence tier, setting, and hospital-fit matching.</p>
+
+  <nav class="nav-tabs">
+    <button type="button" class="nav-tab active" data-tab="atlas">§ Atlas</button>
+    <button type="button" class="nav-tab" data-tab="match">§ Hospital Match</button>
+    <button type="button" class="nav-tab" data-tab="about">§ About</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- =================== ATLAS VIEW =================== -->
+<section id="view-atlas">
+  <div id="atlas-home">
+    <div class="atlas-header">
+      <div class="atlas-intro">
+        <h2>17 strategy families · 107 named interventions</h2>
+        <p>Click a family to see its strategies. Click any strategy for the full qualifying window — mechanism, evidence level, applicable settings, and potential impact. <strong>Verify against current guidance before any use.</strong></p>
+      </div>
+      <div class="filter-bar">
+        <input type="text" class="search-box" placeholder="Search strategies…" id="search-input">
+      </div>
+    </div>
+
+    <div class="legend" style="margin-bottom:18px;">
+      <span class="legend-item"><span class="evidence-dot evidence-high"></span>High evidence</span>
+      <span class="legend-item"><span class="evidence-dot evidence-mod"></span>Moderate evidence</span>
+      <span class="legend-item"><span class="evidence-dot evidence-low"></span>Limited / setting-specific</span>
+      <span class="legend-item"><span class="evidence-dot evidence-emerging"></span>Emerging / pre-adoption</span>
+    </div>
+
+    <div class="family-grid" id="family-grid"></div>
+  </div>
+
+  <div class="subtopic-view" id="subtopic-view">
+    <div class="breadcrumb" id="crumb-back">Back to atlas</div>
+    <div class="family-header">
+      <h2><span class="letter" id="family-letter"></span><span id="family-name"></span></h2>
+      <p class="description" id="family-desc"></p>
+    </div>
+    <div class="strategy-list" id="strategy-list"></div>
+  </div>
+</section>
+
+<!-- =================== MATCH VIEW =================== -->
+<section id="view-match" class="match-view">
+  <div class="match-intro">
+    <div>
+      <h2>Describe your <span class="italic">hospital</span>.<br>Get a ranked stewardship playbook.</h2>
+      <p>Select the characteristics that match your setting. A transparent rule-based engine scores each of the 100+ strategies against your profile and returns them graded by fit — A (priority), B (high value), C (consider). An AI-generated narrative then contextualises the top-ranked strategies for your specific setting.</p>
+      <p style="margin-top:12px; font-size:13px;"><em>Hybrid approach: rule-based triage (transparent, auditable) with AI narrative on top. All outputs require AMS expert review before use.</em></p>
+    </div>
+
+    <div class="profile-form">
+      <div class="form-field">
+        <label>Setting type <span class="hint">select all that apply</span></label>
+        <div class="option-grid" id="opt-setting"></div>
+      </div>
+      <div class="form-field">
+        <label>Specialty mix <span class="hint">optional</span></label>
+        <div class="option-grid" id="opt-specialty"></div>
+      </div>
+      <div class="form-field">
+        <label>AMS maturity</label>
+        <div class="option-grid" id="opt-maturity"></div>
+      </div>
+      <div class="form-field">
+        <label>Known challenges <span class="hint">optional</span></label>
+        <div class="option-grid" id="opt-challenge"></div>
+      </div>
+      <div class="form-field">
+        <label>Resources / infrastructure <span class="hint">select all that apply</span></label>
+        <div class="option-grid" id="opt-resource"></div>
+      </div>
+      <div class="form-field">
+        <label>Additional context <span class="hint">free text, optional</span></label>
+        <textarea class="free-text" id="free-context" placeholder="e.g. District general hospital, rising CPE rates, no ID consultant on site, paper-based prescribing in 2 wards..."></textarea>
+      </div>
+      <button type="button" class="analyze-btn" id="analyze-btn">§ Generate Playbook</button>
+    </div>
+  </div>
+
+  <div class="results-section" id="results-section">
+    <div class="results-header">Your tailored playbook</div>
+    <div class="results-sub" id="results-sub"></div>
+
+    <div style="padding: 10px 16px; border: 1px dashed var(--accent); background: transparent; margin: 16px 0 20px; font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent);">
+      ⚠ Educational output. Every recommendation below requires review by a qualified AMS expert before implementation.
+    </div>
+
+    <div class="narrative-panel" id="narrative-panel">
+      <div class="narrative-header">
+        <span>§ Contextual narrative</span>
+        <span class="ai-tag">AI-generated · review required</span>
+      </div>
+      <div class="narrative-content" id="narrative-content">
+        <div class="narrative-loading">Generating contextual narrative</div>
+      </div>
+    </div>
+
+    <div id="results-list"></div>
+  </div>
+</section>
+
+<!-- =================== ABOUT VIEW =================== -->
+<section id="view-about" style="display:none;">
+  <div style="max-width:760px;">
+    <h2 style="font-family:Fraunces,serif; font-size:32px; margin-bottom:16px;">About this atlas</h2>
+
+    <div style="padding: 20px 24px; border: 2px solid var(--accent); background: var(--paper-warm); margin-bottom: 24px;">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:2px; color:var(--accent); margin-bottom:10px;">§ Important Caveat</div>
+      <p style="font-size:14.5px; line-height:1.6; margin-bottom:8px;"><strong>This is an educational tool.</strong> It is designed for teaching, discussion, and orientation to the AMS literature. It is not clinical decision support, not a guideline, and not a substitute for local policy.</p>
+      <p style="font-size:14.5px; line-height:1.6;"><strong>All recommendations generated by this tool — including hospital-matching results and AI-generated narratives — must be reviewed and validated by a qualified AMS expert before any clinical, operational, or policy implementation.</strong></p>
+    </div>
+
+    <div style="font-size:15px; line-height:1.7;">
+      <p style="margin-bottom:14px;">The Stewardship Atlas organises named antimicrobial stewardship strategies drawn from the wider AMS literature into a single navigable structure of <strong>17 families</strong> containing <strong>107 individual interventions</strong>.</p>
+      <p style="margin-bottom:14px;">Each strategy entry includes: mechanism, evidence tier, typical setting, and a concise impact statement. <strong>Policy sources and citations have been deliberately omitted</strong> — users must verify every strategy against current local and national guidance (WHO, CDC, IDSA/SHEA, ESCMID, NICE, UKHSA, and peer-reviewed literature) before any teaching, clinical, or policy use. These are teaching summaries only, not referenced guidelines.</p>
+      <p style="margin-bottom:14px;"><strong>Evidence tiers</strong> are a simplified categorisation:</p>
+      <ul style="margin: 0 0 14px 20px;">
+        <li><strong>High</strong> — multiple RCTs or meta-analyses, endorsed by major guidelines</li>
+        <li><strong>Moderate</strong> — consistent observational evidence and guideline endorsement</li>
+        <li><strong>Limited / setting-specific</strong> — evidence varies or is specific to certain contexts</li>
+        <li><strong>Emerging</strong> — pre-adoption; active research, not standard of care</li>
+      </ul>
+      <p style="margin-bottom:14px;">The hospital-matching engine uses a <strong>hybrid approach</strong>: a transparent rule-based scoring system triages strategies against the profile, and an optional AI-generated narrative contextualises the top-ranked strategies. The rule-based scores are fully auditable — each score includes the reasons that produced it. The narrative layer is informational and must be treated with appropriate caution; AI outputs can be subtly wrong even when they sound authoritative.</p>
+
+      <div style="margin-top:32px; padding-top:20px; border-top: 1px solid var(--ink);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:8px;">§ Authorship</div>
+        <p style="font-family:Fraunces,serif; font-size:18px; margin-bottom:4px;"><strong>Dr Suryabrata Banerjee</strong></p>
+        <p style="font-size:13px; color:var(--slate); margin-bottom:8px;">Consultant Microbiologist &amp; Clinical Lead</p>
+        <p style="font-family:Fraunces,serif; font-style:italic; font-size:15px; color:var(--accent);">microregistrar.com</p>
+      </div>
+
+      <p style="font-size:13px; color:var(--muted); margin-top:24px; font-style:italic;">Compiled for educational use in FRCPath preparation, ESCMID/ESGAID training, and NHS AMS team onboarding. Not a substitute for clinical guidelines.</p>
+    </div>
+  </div>
+</section>
+
+<div class="footer-note">
+  <span>§ AMS Strategy Atlas · Dr Suryabrata Banerjee · microregistrar.com</span>
+  <span>Educational use only — all recommendations require AMS expert review</span>
+  <span>Evidence tiers are simplified — see About</span>
+</div>
+
+</main>
+
+<!-- =================== MODAL =================== -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <button type="button" class="modal-close" id="modal-close">Close ×</button>
+    <div class="modal-header">
+      <div class="modal-tag" id="m-tag"></div>
+      <h2 class="modal-title" id="m-title"></h2>
+      <p class="modal-oneliner" id="m-oneliner"></p>
+    </div>
+    <div class="modal-body">
+      <div class="section-block">
+        <div class="section-label">Mechanism · How it works</div>
+        <div class="section-content" id="m-mechanism"></div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Evidence tier</div>
+        <div class="section-content"><span class="evidence-badge" id="m-evidence"></span></div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Potential impact</div>
+        <div class="section-content" id="m-impact"></div>
+      </div>
+      <div class="section-block">
+        <div class="section-label">Applicable settings</div>
+        <div class="section-content"><div class="settings-row" id="m-settings"></div></div>
+      </div>
+      <div class="section-block" id="m-caveat-block" style="display:none;">
+        <div class="section-label">Caveat</div>
+        <div class="section-content" id="m-caveat" style="font-style:italic; color:var(--slate);"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DEFENSIVE: prevent any stray anchor clicks from scrolling to top
+// (belt-and-braces for embedding contexts like WordPress)
+// ============================================================
+document.addEventListener('click', function(e) {
+  const target = e.target.closest('a[href="#"], a[href=""]');
+  if (target) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
+
+// ============================================================
+// DATA MODEL
+// Families → Strategies with full metadata
+// ============================================================
+
+const FAMILIES = [
+  {
+    id: 'A', name: 'Prescribing & Clinical Decision', tag: 'Core prescribing',
+    description: 'How antibiotics are started, chosen, narrowed and stopped at the point of care.',
+    strategies: [
+      { id:'A1', name:'Start Smart Then Focus', oneliner:'Appropriate empiric therapy + structured 48–72h review.',
+        mechanism:'Early empiric cover based on severity and local epidemiology ("start smart"), followed by formal review at 48–72 hours once cultures return. Review checklist covers indication, cultures, route, duration.',
+        evidence:'high', impact:'Improves appropriateness, reduces DOT, reduces broad-spectrum exposure.',
+        settings:['Acute hospital','ICU','Surgical','ED'] },
+      { id:'A2', name:'Antibiotic Timeout', oneliner:'Self-directed reassessment at 48–72h.',
+        mechanism:'Prescriber-driven structured reassessment without external policing. Often embedded in EHR order-set review prompts.',
+        evidence:'mod', impact:'Lower-resource alternative to PAF; moderate effect on DOT.',
+        settings:['Acute hospital','ED','Outpatient'] },
+      { id:'A3', name:'Handshake Stewardship', oneliner:'Daily in-person rounds with collegial feedback.',
+        mechanism:'AMS pharmacist/ID physician attends wards, reviews cases face-to-face, no formal pre-authorisation. Relies on relational influence.',
+        evidence:'mod', impact:'Sustained reductions in broad-spectrum use; high acceptability.',
+        settings:['Paediatric','Acute hospital','ICU'] },
+      { id:'A4', name:'Day-3 Bundle Review / 72h Review', oneliner:'Structured MDT review on day 3.',
+        mechanism:'Mandatory structured review at 72h covering de-escalation, IV-PO, duration, and stop date by consultant or pharmacist.',
+        evidence:'mod', impact:'Reduces DOT; improves documentation quality.',
+        settings:['Acute hospital','ICU'] },
+      { id:'A5', name:'De-escalation', oneliner:'Narrow spectrum once cultures known.',
+        mechanism:'Switch from broad empiric cover to narrowest effective agent based on culture and clinical response; also stop redundant combinations.',
+        evidence:'high', impact:'Reduces collateral damage, C. difficile, resistance pressure.',
+        settings:['Acute hospital','ICU','Surgical'] },
+      { id:'A6', name:'Duration Optimisation ("Shorter is Better")', oneliner:'Guideline-based shorter courses.',
+        mechanism:'Systematic adoption of evidence-based shorter durations (e.g. 5-day CAP, 7-day GN bacteraemia, 7-day complicated UTI). Enforced via default order-set durations and auto-stops.',
+        evidence:'high', impact:'Among highest-yield AMS interventions; large DOT reduction.',
+        settings:['All settings'] },
+      { id:'A7', name:'IV-to-Oral Switch', oneliner:'Early conversion where absorption permits.',
+        mechanism:'Protocolised switch criteria (clinically improving, tolerating oral, no malabsorption, suitable oral agent). Often pharmacist-led.',
+        evidence:'high', impact:'Reduces LOS, CLABSI risk, cost. NHS England IVOST programme targets 50% switch by day 3.',
+        settings:['Acute hospital'] },
+      { id:'A8', name:'Dose Optimisation (PK/PD)', oneliner:'Extended infusions, renal/hepatic dosing.',
+        mechanism:'PK/PD-informed dosing including extended/continuous beta-lactam infusion, renal/hepatic adjustment, obesity dosing.',
+        evidence:'mod', impact:'Improves attainment of PK/PD targets; particularly important in critical illness and MDR infection.',
+        settings:['ICU','Haematology','Complex infection'] },
+      { id:'A9', name:'Therapeutic Drug Monitoring', oneliner:'Measured-concentration-guided dosing.',
+        mechanism:'Vancomycin AUC:MIC, aminoglycoside levels, beta-lactam TDM in ICU, azole TDM (voriconazole, posaconazole).',
+        evidence:'high', impact:'Reduces toxicity, improves efficacy; particularly impactful for voriconazole.',
+        settings:['ICU','Haematology','Renal'] },
+      { id:'A10', name:'Risk-Stratified Empiric Pathways', oneliner:'Severity- and host-specific empiric choice.',
+        mechanism:'Empiric therapy keyed to CURB-65 (CAP), sepsis pathway severity, HAP vs CAP, device-associated, immunocompromised, prior culture/resistance.',
+        evidence:'high', impact:'Reduces both undertreatment and overuse by improving initial targeting.',
+        settings:['ED','Acute hospital','ICU'] },
+      { id:'A11', name:'Perioperative Prophylaxis Optimisation', oneliner:'Right agent, right time, 24h stop.',
+        mechanism:'Agent choice by procedure, dosing 30–60 min pre-incision, weight-based redosing, ≤24h duration, no post-drain prophylaxis.',
+        evidence:'high', impact:'Reduces SSI and AMR pressure; "stop at 24h" is a high-yield target.',
+        settings:['Surgical','Obstetric'] },
+      { id:'A12', name:'Avoid Unnecessary Combinations', oneliner:'Stop overlapping spectrum and double cover.',
+        mechanism:'Review of double gram-negative cover, anti-anaerobe redundancy, unnecessary MRSA cover. Often combined with de-escalation.',
+        evidence:'mod', impact:'Reduces toxicity and resistance selection.',
+        settings:['Acute hospital','ICU'] }
+    ]
+  },
+  {
+    id: 'B', name: 'Restrictive Strategies', tag: 'Access control',
+    description: 'Structural controls on which agents can be prescribed, by whom, and for how long.',
+    strategies: [
+      { id:'B1', name:'Pre-Authorisation', oneliner:'Approval required from ID/AMS before dispensing.',
+        mechanism:'Selected restricted agents (often carbapenems, novel β-lactams, echinocandins) require approval prior to dispensing.',
+        evidence:'high', impact:'Among most effective interventions for reducing restricted drug use; risk of delay if not well-staffed.',
+        settings:['Acute hospital','ICU'] },
+      { id:'B2', name:'Formulary Restriction', oneliner:'Not all agents available; some indication-limited.',
+        mechanism:'Local formulary restricts availability of agents or limits to specific indications. Tiered restriction adds escalation layers.',
+        evidence:'high', impact:'Shapes prescribing defaults. Works synergistically with guidelines.',
+        settings:['All hospital settings'] },
+      { id:'B3', name:'Automatic Stop Orders', oneliner:'Default stop dates enforced by EHR.',
+        mechanism:'EHR automatically stops antibiotic after defined duration (e.g. 24h for perioperative prophylaxis, 7 days for most courses) unless actively re-authorised.',
+        evidence:'mod', impact:'Effective for perioperative prophylaxis; requires safety netting.',
+        settings:['Acute hospital','Surgical'] },
+      { id:'B4', name:'Reserve-Class Restriction', oneliner:'AWaRe Reserve agents gated.',
+        mechanism:'Reserve agents (colistin, ceftazidime-avibactam, cefiderocol, linezolid in some contexts) limited to MDR indications with ID approval.',
+        evidence:'mod', impact:'Preserves activity of last-resort agents.',
+        settings:['Acute hospital','ICU'] },
+      { id:'B5', name:'Hard Stops in CPOE', oneliner:'EHR blocks prescription without justification.',
+        mechanism:'EHR prevents ordering of restricted agents without completing approval workflow or entering rationale.',
+        evidence:'mod', impact:'Forces compliance with restriction pathway; risk of override fatigue.',
+        settings:['EHR-mature settings'] }
+    ]
+  },
+  {
+    id: 'C', name: 'Diagnostic Stewardship', tag: 'Right test, right time',
+    description: 'Optimising when and how diagnostic tests are ordered and interpreted to reduce unnecessary therapy.',
+    strategies: [
+      { id:'C1', name:'Rapid Diagnostics-Coupled AMS', oneliner:'Real-time AMS response to rapid blood culture ID.',
+        mechanism:'MALDI-TOF, BioFire BCID, Verigene, T2 Biosystems, Accelerate Pheno linked to 24/7 pharmacist response for therapy optimisation.',
+        evidence:'high', impact:'Reduces time to optimal therapy, LOS, mortality in bacteraemia.',
+        settings:['Acute hospital with rapid dx capability'] },
+      { id:'C2', name:'Syndromic PCR Panel Stewardship', oneliner:'Gatekeeping and interpretation of multiplex panels.',
+        mechanism:'ME panel, GI panel, respiratory panels require clinical criteria for ordering and structured interpretation to prevent overtreatment of detected colonisers.',
+        evidence:'mod', impact:'Reduces inappropriate antibiotic starts from panel false-positive or clinically irrelevant findings.',
+        settings:['Acute hospital','ED'] },
+      { id:'C3', name:'Urine Culture Gatekeeping', oneliner:'Reflex-on-pyuria, specimen rejection criteria.',
+        mechanism:'Lab releases culture only if dipstick/microscopy-positive; rejection of poorly collected or contaminated samples.',
+        evidence:'mod', impact:'Reduces ASB overtreatment and catheter-associated treatment.',
+        settings:['All settings'] },
+      { id:'C4', name:'Respiratory Culture Stewardship', oneliner:'Quality scoring before processing sputum.',
+        mechanism:'Bartlett/Q-score for sputum quality; rejection of oropharyngeal contamination; endotracheal aspirate quality thresholds.',
+        evidence:'mod', impact:'Reduces treatment of colonisers; improves culture yield interpretation.',
+        settings:['Respiratory','ICU'] },
+      { id:'C5', name:'Two-Step C. difficile Algorithms', oneliner:'GDH+toxin or NAAT+toxin to avoid overdiagnosis.',
+        mechanism:'Two-step algorithm distinguishes colonisation from infection; most UK labs use GDH+toxin EIA with NAAT arbitration.',
+        evidence:'high', impact:'Reduces overtreatment of colonisation; critical for accurate surveillance.',
+        settings:['All hospital and LTCF'] },
+      { id:'C6', name:'Blood Culture Stewardship', oneliner:'Indication, volume, contamination control.',
+        mechanism:'Indication-based ordering, ≥2 sets, adequate blood volume, skin antisepsis bundles, dedicated phlebotomy teams.',
+        evidence:'high', impact:'Higher yield, fewer contaminants, less unnecessary treatment of CoNS.',
+        settings:['All hospital'] },
+      { id:'C7', name:'MRSA Nasal PCR De-escalation', oneliner:'Negative swab supports stopping anti-MRSA cover.',
+        mechanism:'High NPV (~99%) of nasal MRSA PCR supports stopping empiric vancomycin/linezolid in pneumonia when negative.',
+        evidence:'high', impact:'Median 1.4-day reduction in anti-MRSA therapy.',
+        settings:['Acute hospital with PCR capability'] },
+      { id:'C8', name:'Neonatal EOS Calculator', oneliner:'Kaiser Permanente calculator reduces antibiotic starts.',
+        mechanism:'Multivariable predictor of early-onset sepsis risk based on maternal and neonatal factors; guides observation vs antibiotic starts.',
+        evidence:'high', impact:'~50% reduction in antibiotic exposure in well-appearing neonates.',
+        settings:['Neonatology'] },
+      { id:'C9', name:'Host-Response Signatures', oneliner:'Gene-expression discrimination of bacterial vs viral.',
+        mechanism:'Commercial assays (e.g. TriVerity, MeMed BV, HostDx) use host gene expression or protein signatures.',
+        evidence:'emerging', impact:'Promising in RTI triage; real-world AMS effect not yet established.',
+        settings:['ED','Primary care (emerging)'],
+        caveat:'Pre-adoption in most health systems; evidence base still maturing.' }
+    ]
+  },
+  {
+    id: 'D', name: 'Biomarker-Guided Therapy', tag: 'Objective stop cues',
+    description: 'Using measured biomarkers to guide initiation and — especially — discontinuation.',
+    strategies: [
+      { id:'D1', name:'Procalcitonin-Guided Stopping', oneliner:'PCT trajectory guides cessation.',
+        mechanism:'Structured algorithm stops antibiotics when PCT falls below threshold or drops >80% from peak. Strongest evidence in ICU and LRTI.',
+        evidence:'high', impact:'Mean 2–3 day DOT reduction in LRTI/sepsis with no safety signal.',
+        settings:['ICU','Acute hospital LRTI'] },
+      { id:'D2', name:'CRP-Guided Prescribing (Primary Care)', oneliner:'Point-of-care CRP reduces RTI prescribing.',
+        mechanism:'POCT CRP with cutoffs (<20 no antibiotic, 20–100 shared decision, >100 consider) in LRTI.',
+        evidence:'high', impact:'~30% relative reduction in antibiotic prescribing for LRTI.',
+        settings:['Primary care','Community pharmacy'] },
+      { id:'D3', name:'Viral PCR Linkage to Antibacterial Stopping', oneliner:'Positive viral panel prompts review.',
+        mechanism:'Protocolised reassessment when respiratory viral PCR positive in mild/moderate LRTI without clear bacterial features.',
+        evidence:'mod', impact:'Variable effect; depends on clinician confidence and test turnaround.',
+        settings:['Acute hospital','ED'] }
+    ]
+  },
+  {
+    id: 'E', name: '"Do Not Treat" Stewardship', tag: 'Prevent unnecessary starts',
+    description: 'Syndromic strategies that prevent initiation when microbiology generates pressure to treat without infection.',
+    strategies: [
+      { id:'E1', name:'Asymptomatic Bacteriuria Non-Treatment', oneliner:'Do not treat ASB outside specific populations.',
+        mechanism:'Structured reminders, pathway gates, lab comments. Exceptions: pregnancy, pre-urological procedure with mucosal trauma.',
+        evidence:'high', impact:'Major source of unnecessary antibiotic exposure — especially in LTCF and post-catheterisation.',
+        settings:['All settings, especially LTCF'] },
+      { id:'E2', name:'Colonisation vs Infection Framework', oneliner:'Teach and enforce clinical correlation.',
+        mechanism:'Structured prompts on reports, teaching modules, pre-prescription checkpoints distinguishing colonisation (wound swabs, respiratory) from infection.',
+        evidence:'mod', impact:'Reduces treatment of growths lacking clinical syndrome.',
+        settings:['All settings'] },
+      { id:'E3', name:'Viral RTI Non-Antibiotic Pathways', oneliner:'Explicit no-antibiotic scripts for URTI.',
+        mechanism:'Clinical decision tools and patient scripts direct management of otitis media, pharyngitis (excl GAS), sinusitis, bronchitis without antibiotics.',
+        evidence:'high', impact:'Primary care is highest-volume prescribing setting; pathway adherence has large population impact.',
+        settings:['Primary care','ED','Paediatrics'] },
+      { id:'E4', name:'Screening-Positive Non-Treatment', oneliner:'MRSA/VRE/CPE colonisation ≠ treatment.',
+        mechanism:'Active protocols prevent treatment of screening-positive colonisation; may trigger IPC measures without antimicrobial therapy.',
+        evidence:'high', impact:'Prevents systemic treatment of asymptomatic colonisation.',
+        settings:['All hospital'] }
+    ]
+  },
+  {
+    id: 'F', name: 'Laboratory-Side Prescribing Interventions', tag: 'Report design as intervention',
+    description: 'The microbiology lab is a prescribing intervention. Report design, expert rules, and selective disclosure shape clinician choices.',
+    strategies: [
+      { id:'F1', name:'Selective Reporting', oneliner:'Suppress broad-spectrum susceptibilities by default.',
+        mechanism:'Lab withholds results for restricted or unnecessarily broad agents unless clinically required. E.g. suppressing ciprofloxacin in uncomplicated UTI.',
+        evidence:'mod', impact:'Nudges narrower prescribing with minimal workflow burden.',
+        settings:['All lab settings'] },
+      { id:'F2', name:'Cascade / Tiered Reporting', oneliner:'Reveal broader agents only if narrower fail.',
+        mechanism:'Sequential reporting — first-line agent susceptibilities released first; second-line only released on request or if resistance detected.',
+        evidence:'mod', impact:'Supports first-line prescribing; requires clinician understanding.',
+        settings:['All lab settings'] },
+      { id:'F3', name:'Interpretive Comments', oneliner:'Free-text nudges on the report.',
+        mechanism:'Appended comments recommending de-escalation, narrow options, stop if colonisation, source control advice.',
+        evidence:'mod', impact:'High acceptability; variable effect depending on recipient.',
+        settings:['All lab settings'] },
+      { id:'F4', name:'EUCAST Expert Rules', oneliner:'Suppress results inconsistent with known resistance.',
+        mechanism:'EUCAST ERP applies rules (e.g. ESBL phenotype → edit cephalosporin results) to prevent misleading susceptibility reporting.',
+        evidence:'high', impact:'Critical for safe reporting; prevents inappropriate use of compromised agents.',
+        settings:['All lab settings'] },
+      { id:'F5', name:'Reflex Testing Algorithms', oneliner:'Auto-extend testing based on first results.',
+        mechanism:'Automatic addition of tests (e.g. carbapenemase testing if meropenem R; serology if screening positive) without repeat request.',
+        evidence:'mod', impact:'Faster definitive answers; better stewardship downstream.',
+        settings:['All lab settings'] },
+      { id:'F6', name:'Syndrome-Specific Antibiograms', oneliner:'Antibiograms curated to clinical syndrome.',
+        mechanism:'Stratified antibiograms (e.g. uncomplicated community UTI, HAP, SSTI) rather than whole-isolate aggregates.',
+        evidence:'mod', impact:'More clinically useful than pooled antibiograms.',
+        settings:['All acute hospitals'] },
+      { id:'F7', name:'Unit-Specific / Onset-Stratified Antibiograms', oneliner:'ICU, haematology, community-onset separately.',
+        mechanism:'Antibiograms by ward, age-band, community vs hospital onset to inform local empiric choice.',
+        evidence:'mod', impact:'Improves empiric targeting; reveals unit-level AMR trends.',
+        settings:['Acute hospital'] },
+      { id:'F8', name:'Prior Isolate Visibility at Prescribing', oneliner:'Show patient’s previous results in the EHR.',
+        mechanism:'EHR surfaces patient’s prior MDR colonisation/infection at point of prescribing.',
+        evidence:'mod', impact:'Improves empiric agent selection in patients with prior resistant organisms.',
+        settings:['EHR-mature settings'] },
+      { id:'F9', name:'Blood Culture Contamination Commenting', oneliner:'Flag probable skin contaminants.',
+        mechanism:'Automated or narrative comments identifying likely contamination (single-bottle CoNS, mixed skin flora).',
+        evidence:'mod', impact:'Reduces treatment of likely contaminants; protects vancomycin exposure.',
+        settings:['All hospital'] }
+    ]
+  },
+  {
+    id: 'G', name: 'Digital & Choice Architecture', tag: 'Defaults that do the work',
+    description: 'EHR design and default engineering — often the highest-leverage, lowest-friction AMS interventions.',
+    strategies: [
+      { id:'G1', name:'Indication-Mandatory Prescribing', oneliner:'No order without selected indication.',
+        mechanism:'EHR requires selecting an indication from a structured list before order completion.',
+        evidence:'mod', impact:'Enables audit by indication; improves prescriber reflection.',
+        settings:['EHR-mature settings'] },
+      { id:'G2', name:'Mandatory Duration & Review Fields', oneliner:'No open-ended orders.',
+        mechanism:'Prescriber must enter a finite duration and/or review date; no perpetual prescriptions.',
+        evidence:'mod', impact:'Eliminates "no stop date" orders that drive extended courses.',
+        settings:['EHR-mature settings'] },
+      { id:'G3', name:'Off-Guideline Rationale Required', oneliner:'Text-entry mandatory for deviation.',
+        mechanism:'EHR demands free-text justification for non-formulary or off-guideline prescribing. See also "Accountable Justification" (H1) — same mechanism in behavioural framing.',
+        evidence:'high', impact:'~10–15% reduction in inappropriate prescribing in primary care (Meeker 2016).',
+        settings:['EHR-mature settings'] },
+      { id:'G4', name:'Default Shortest Evidence-Based Duration', oneliner:'Order sets pre-populate the short option.',
+        mechanism:'Choice architecture: the default is the evidence-based shortest course; longer durations require active deviation.',
+        evidence:'mod', impact:'High-yield, low-friction intervention in EHR-mature settings.',
+        settings:['Acute hospital with EHR'] },
+      { id:'G5', name:'Default Oral and Narrow-Spectrum First', oneliner:'Order-set ordering engineered for stewardship.',
+        mechanism:'Order-set sequencing presents oral before IV, narrow before broad; broader hidden behind extra clicks.',
+        evidence:'mod', impact:'Reduces reflexive broad-spectrum IV starts.',
+        settings:['Acute hospital with EHR'] },
+      { id:'G6', name:'Clinical Decision Support Alerts', oneliner:'Real-time EHR nudges.',
+        mechanism:'Alerts for allergy conflicts, duplicate therapy, renal dosing, redundant spectrum.',
+        evidence:'mod', impact:'Effect moderated by alert fatigue — must be judiciously designed.',
+        settings:['EHR-mature settings'],
+        caveat:'Over-alerting causes fatigue and override; tight curation is essential.' },
+      { id:'G7', name:'Antibiotic Dashboards', oneliner:'DDD/DOT and resistance visualised.',
+        mechanism:'Near-real-time dashboards showing consumption, compliance, resistance overlays at ward/trust level.',
+        evidence:'mod', impact:'Enables targeted AMS effort; visibility drives accountability.',
+        settings:['Trust/system level'] },
+      { id:'G8', name:'Prescriber Scorecards', oneliner:'Individual prescriber-level reporting.',
+        mechanism:'Periodic peer-comparison reports on volume, mix, and guideline adherence.',
+        evidence:'high', impact:'Peer-comparison is one of the best-evidenced behavioural AMS levers.',
+        settings:['Primary care','Hospital prescribers'] }
+    ]
+  },
+  {
+    id: 'H', name: 'Behavioural & Social Strategies', tag: 'Nudges and norms',
+    description: 'Low-cost, high-evidence behavioural interventions drawn from nudge science.',
+    strategies: [
+      { id:'H1', name:'Accountable Justification', oneliner:'Mandatory EHR rationale for off-guideline.',
+        mechanism:'Free-text justification requirement in EHR when deviating. Public-facing within the record.',
+        evidence:'high', impact:'Large, sustained reductions in inappropriate prescribing in primary care.',
+        settings:['Primary care','Outpatient','Hospital'] },
+      { id:'H2', name:'Peer Comparison Feedback', oneliner:'"You are / are not a top prescriber".',
+        mechanism:'Email or EHR-embedded messages comparing individual rates with peers.',
+        evidence:'high', impact:'Hallsworth 2016: ~3.3% absolute reduction in primary care prescribing from a single CMO letter.',
+        settings:['Primary care','Outpatient'] },
+      { id:'H3', name:'Commitment Posters', oneliner:'Public pledges visible in clinic rooms.',
+        mechanism:'Clinician signs and displays a commitment to judicious prescribing in consultation rooms.',
+        evidence:'high', impact:'~20% reduction in inappropriate RTI prescribing — near-zero cost.',
+        settings:['Primary care'] },
+      { id:'H4', name:'Delayed / Back-Pocket Prescribing', oneliner:'Prescription if not better in X days.',
+        mechanism:'Patient receives prescription to fill only if symptoms fail to improve or worsen by a defined time.',
+        evidence:'high', impact:'Reduces antibiotic consumption with comparable clinical outcomes in self-limiting RTI.',
+        settings:['Primary care','ED','Dentistry'] },
+      { id:'H5', name:'Watchful Waiting & Safety Netting', oneliner:'Active observation with reconsultation criteria.',
+        mechanism:'Structured scripts defining when to return, red flags, expected course.',
+        evidence:'mod', impact:'Supports no-antibiotic consultations; lowers return rates when done well.',
+        settings:['Primary care','ED'] },
+      { id:'H6', name:'Shared Decision Aids / TARGET Leaflets', oneliner:'Structured conversation tools.',
+        mechanism:'TARGET (RCGP) leaflets, decision aids, and scripts for specific RTIs.',
+        evidence:'mod', impact:'Improves patient acceptance of no-antibiotic decisions.',
+        settings:['Primary care','Community pharmacy'] }
+    ]
+  },
+  {
+    id: 'I', name: 'Transitions of Care', tag: 'Discharge & OPAT',
+    description: 'A large share of total antibiotic days occur after hospital discharge. Transitions are an under-targeted stewardship domain.',
+    strategies: [
+      { id:'I1', name:'Discharge Antibiotic Review', oneliner:'Structured review pre-discharge.',
+        mechanism:'Pharmacist or AMS team review of indication, duration, route before discharge prescription; tail-shortening.',
+        evidence:'mod', impact:'Discharge prescriptions account for 30–50% of total hospital antibiotic days.',
+        settings:['Acute hospital'] },
+      { id:'I2', name:'Tail-Duration Shortening', oneliner:'Avoid unnecessarily long discharge courses.',
+        mechanism:'Active review: has patient met stop criteria? Can total course be shorter than originally planned?',
+        evidence:'mod', impact:'Reduces "just in case" extended discharge courses.',
+        settings:['Acute hospital'] },
+      { id:'I3', name:'Oral Step-Down at Discharge', oneliner:'Oral complete courses where bioavailability permits.',
+        mechanism:'Default to oral discharge where agent/infection allow; avoids unnecessary OPAT.',
+        evidence:'high', impact:'Major cultural shift post-OVIVA/POET for bone/joint infection and endocarditis.',
+        settings:['Acute hospital'] },
+      { id:'I4', name:'OPAT Stewardship', oneliner:'MDT governance of outpatient IV.',
+        mechanism:'Structured weekly MDT review, defined stop dates, complication monitoring, line management.',
+        evidence:'high', impact:'Reduces IV days, CLABSI, readmissions; OPAT is now recognised as an AMS domain.',
+        settings:['OPAT services'] },
+      { id:'I5', name:'Follow-Up Stop-Date Ownership', oneliner:'Named clinician owns the stop decision.',
+        mechanism:'Explicit handover of responsibility for stopping or reviewing — avoids courses continuing by inertia.',
+        evidence:'low', impact:'Addresses a common gap where no-one owns stopping.',
+        settings:['OPAT','Complex cases'] }
+    ]
+  },
+  {
+    id: 'J', name: 'Allergy Stewardship', tag: 'Restore beta-lactam access',
+    description: 'Penicillin allergy labels reduce Access-class use, increase broad-spectrum alternatives, and increase adverse outcomes. De-labelling is increasingly a core AMS activity.',
+    strategies: [
+      { id:'J1', name:'Structured Allergy History', oneliner:'Systematic characterisation of the reaction.',
+        mechanism:'Protocolised questions distinguishing likely IgE, delayed T-cell, intolerance, or label without reaction.',
+        evidence:'high', impact:'Foundation for all de-labelling pathways.',
+        settings:['All settings'] },
+      { id:'J2', name:'PEN-FAST Risk Stratification', oneliner:'Validated 5-point risk tool.',
+        mechanism:'Score-based stratification to identify low-risk patients suitable for direct oral challenge.',
+        evidence:'high', impact:'Enables safe, scalable allergy assessment.',
+        settings:['All settings'] },
+      { id:'J3', name:'Direct Oral Challenge', oneliner:'Single supervised dose for low-risk patients.',
+        mechanism:'Low-risk patients (PEN-FAST 0–1) receive observed oral amoxicillin challenge; positive de-labelling.',
+        evidence:'high', impact:'Expands Access-antibiotic use; reduces vancomycin, clindamycin, fluoroquinolone use.',
+        settings:['Allergy-integrated hospital services'] },
+      { id:'J4', name:'Skin Testing Pathways', oneliner:'For intermediate-risk labels.',
+        mechanism:'Formal skin-prick/intradermal testing, typically allergist-led, for intermediate-risk patients.',
+        evidence:'high', impact:'Enables de-labelling of a broader population than oral challenge alone.',
+        settings:['Specialist allergy services'] },
+      { id:'J5', name:'Perioperative Allergy Optimisation', oneliner:'Resolve labels before surgery.',
+        mechanism:'Elective surgical pathways screen and address allergy labels to ensure optimal prophylaxis (cefazolin).',
+        evidence:'mod', impact:'Improves SSI prevention; reduces vancomycin use.',
+        settings:['Surgical','Perioperative'] }
+    ]
+  },
+  {
+    id: 'K', name: 'Setting-Specific Programmes', tag: 'Context-specific playbooks',
+    description: 'Named AMS frameworks for distinct settings — each with different harms, workflows and intervention menus.',
+    strategies: [
+      { id:'K1', name:'ICU Stewardship', oneliner:'Daily rounds, PCT, de-escalation focus.',
+        mechanism:'Daily AMS rounds, PCT-guided stopping, syndromic de-escalation, TDM, VAP bundles.',
+        evidence:'high', impact:'ICU is highest-density antibiotic-use setting; interventions have outsized effect.',
+        settings:['ICU'] },
+      { id:'K2', name:'Emergency Department Stewardship', oneliner:'Syndrome pathways, delayed prescribing, discharge scripts.',
+        mechanism:'ED-specific order sets, delayed prescribing, reconsultation criteria, discharge handover.',
+        evidence:'mod', impact:'Front-door intervention — shapes downstream hospital and post-discharge use.',
+        settings:['ED'] },
+      { id:'K3', name:'Surgical Stewardship', oneliner:'Prophylaxis, infection pathways, post-op AMS.',
+        mechanism:'Prophylaxis optimisation, SSI bundles, post-op infection pathways, nutritional and host-factor management.',
+        evidence:'high', impact:'Addresses a high-volume, commonly over-prescribed domain.',
+        settings:['Surgical','Obstetric'] },
+      { id:'K4', name:'Neonatal Stewardship', oneliner:'EOS calculator, rule-in/rule-out, biomarker-guided stop.',
+        mechanism:'EOS calculator, structured 36–48h stop rules, CRP trajectory, blood culture reliance.',
+        evidence:'high', impact:'~50% reduction in neonatal antibiotic exposure achievable.',
+        settings:['Neonatology'] },
+      { id:'K5', name:'Long-Term Care Facility AMS', oneliner:'McGeer / Loeb criteria, ASB non-treatment.',
+        mechanism:'Structured initiation criteria, resident-focused syndromic assessment, ASB non-treatment, UTI pathway.',
+        evidence:'high', impact:'LTCF ASB is a very high-yield target; commonly overtreated.',
+        settings:['LTCF','Nursing homes'] },
+      { id:'K6', name:'OPAT Stewardship', oneliner:'See I4.',
+        mechanism:'Covered under Transitions — listed here for setting-specific completeness.',
+        evidence:'high', impact:'OPAT deserves its own named programme separate from inpatient AMS.',
+        settings:['OPAT'] },
+      { id:'K7', name:'Outpatient / Ambulatory AMS', oneliner:'CDC Core Elements for outpatient.',
+        mechanism:'Clinic-level commitment, action, tracking, expertise, education — structured around the CDC outpatient framework.',
+        evidence:'mod', impact:'Addresses 80%+ of human antibiotic volume.',
+        settings:['Primary care','Specialty clinics'] },
+      { id:'K8', name:'Dental Stewardship', oneliner:'FGDP/SDCEP prescribing frameworks.',
+        mechanism:'Dental-specific guidelines; ~5–10% of primary care scripts are dental; focus on infection vs pulpitis.',
+        evidence:'mod', impact:'Traditionally undergoverned prescribing domain with visible reduction potential.',
+        settings:['Dental'] },
+      { id:'K9', name:'Community Pharmacy Stewardship', oneliner:'Pharmacy First, triage, protocol supply.',
+        mechanism:'Pharmacist-led triage, defined supply protocols, non-antibiotic management, referral thresholds, POCT integration.',
+        evidence:'mod', impact:'A national-scale community AMS lever in UK; operationally novel.',
+        settings:['Community pharmacy'] },
+      { id:'K10', name:'Low-Resource Setting AMS', oneliner:'WHO Core Components for LMIC.',
+        mechanism:'Stepwise implementation: leadership, diagnostics, guidelines, education, surveillance, IPC integration.',
+        evidence:'mod', impact:'Frames AMS for settings without ID consultants or EHR infrastructure.',
+        settings:['LMIC'] },
+      { id:'K11', name:'End-of-Life AMS', oneliner:'Antibiotic decisions in palliative care.',
+        mechanism:'Decision-making framework for initiation, continuation, withdrawal in palliative contexts; aligned with advance care plans.',
+        evidence:'low', impact:'Often neglected in AMS; reduces burden and aligns care with goals.',
+        settings:['Palliative care','Oncology'] }
+    ]
+  },
+  {
+    id: 'L', name: 'Parallel Antimicrobial Programmes', tag: 'Beyond antibacterials',
+    description: 'Antifungal, antiviral, and antiparasitic stewardship — distinct programmes, not folded in as afterthoughts.',
+    strategies: [
+      { id:'L1', name:'Antifungal Stewardship (AFS)', oneliner:'Pre-emptive/empiric/targeted algorithm.',
+        mechanism:'BDG, galactomannan, PCR-guided initiation/stop; echinocandin and azole restriction; weekly IFI MDT; TDM for voriconazole/posaconazole/isavuconazole.',
+        evidence:'high', impact:'Weekly MDT models improve appropriate use and cost-efficiency; reduces toxicity.',
+        settings:['Haematology','ICU','Solid-organ transplant'] },
+      { id:'L2', name:'Antiviral Stewardship', oneliner:'Oseltamivir, CMV, HSV duration governance.',
+        mechanism:'Test-linked oseltamivir; CMV stewardship in transplant; duration review for herpesviruses; COVID-era antiviral governance; nirsevimab pathway.',
+        evidence:'mod', impact:'Less mature than antibacterial AMS but increasingly formalised.',
+        settings:['Transplant','Haematology','ICU'] },
+      { id:'L3', name:'Antiparasitic Stewardship', oneliner:'Malaria ACT, anthelminthic governance.',
+        mechanism:'Test-before-treat malaria policy; ACT resistance monitoring; ivermectin/nitazoxanide governance.',
+        evidence:'mod', impact:'Primarily relevant in endemic settings; underdeveloped elsewhere.',
+        settings:['Endemic regions','Travel medicine'] }
+    ]
+  },
+  {
+    id: 'M', name: 'Governance, Policy & Incentives', tag: 'System levers',
+    description: 'Mandatory standards, accreditation, national surveillance and financial incentives that create the conditions for AMS.',
+    strategies: [
+      { id:'M1', name:'CDC/IDSA-SHEA/WHO Core Elements', oneliner:'Leadership, expertise, action, tracking, reporting, education.',
+        mechanism:'Structured programme components required for a functional AMS team.',
+        evidence:'high', impact:'Baseline programmatic infrastructure; without these, specific interventions underperform.',
+        settings:['All hospital settings'] },
+      { id:'M2', name:'Dedicated AMS Team', oneliner:'Protected time, multidisciplinary.',
+        mechanism:'ID physician, AMS pharmacist, microbiologist, IPC, IT/data analyst with protected sessions.',
+        evidence:'high', impact:'Single strongest predictor of sustained AMS impact.',
+        settings:['Acute hospital','Trust level'] },
+      { id:'M3', name:'National Mandatory Standards', oneliner:'CQC, NSQHS, CMS, Joint Commission.',
+        mechanism:'Regulatory requirement for hospitals to have AMS programme (CMS CoP 482.42 in US; CQC expectations in UK; NSQHS Standard 3 in Australia).',
+        evidence:'high', impact:'Policy backbone that drives universal adoption.',
+        settings:['System-level'] },
+      { id:'M4', name:'National Surveillance & Benchmarking', oneliner:'ESPAUR, ESAC-Net, NHSN, GLASS.',
+        mechanism:'National-level consumption and resistance surveillance with public reporting and inter-unit benchmarking.',
+        evidence:'high', impact:'Enables targets, accountability, and cross-system learning.',
+        settings:['National'] },
+      { id:'M5', name:'Incentive-Linked Prescribing Targets', oneliner:'CQUIN, Quality Premium, P4P.',
+        mechanism:'Financial incentives tied to prescribing reduction targets and specific indicators (e.g. UK AMR CQUIN 2016–2019).',
+        evidence:'mod', impact:'UK AMR CQUIN drove ~7% reduction in total antibiotic use in acute trusts.',
+        settings:['National health systems'] },
+      { id:'M6', name:'AWaRe Access/Watch/Reserve Targets', oneliner:'≥60% Access use as a national target.',
+        mechanism:'Prescribing and procurement structured by AWaRe classes; WHO target of ≥60% Access antibiotic use.',
+        evidence:'mod', impact:'Single most adoptable stewardship target at population level.',
+        settings:['National'] },
+      { id:'M7', name:'Public Reporting', oneliner:'Transparent consumption and resistance data.',
+        mechanism:'Public publication of hospital- or trust-level AMS and resistance metrics.',
+        evidence:'mod', impact:'Reputational pressure; informed commissioning and public engagement.',
+        settings:['National'] }
+    ]
+  },
+  {
+    id: 'N', name: 'One Health', tag: 'Cross-sector',
+    description: 'Antimicrobial use in veterinary, agricultural, and environmental domains shapes human AMR. One Health stewardship is increasingly part of the AMS master list.',
+    strategies: [
+      { id:'N1', name:'Veterinary Prescribing Targets', oneliner:'RUMA, sector-specific reduction targets.',
+        mechanism:'Livestock sector targets (UK RUMA Targets Task Force) with specific reductions by species.',
+        evidence:'mod', impact:'UK achieved ~55% reduction in food-producing animal antibiotic use (2014–2020).',
+        settings:['Agriculture'] },
+      { id:'N2', name:'Agricultural Restriction of HPCIAs', oneliner:'Colistin and growth-promoter bans.',
+        mechanism:'Regulatory restriction of WHO-classified critically important antimicrobials in animals, particularly for growth promotion.',
+        evidence:'high', impact:'Reduces AMR selection pressure at the population level.',
+        settings:['Agriculture'] },
+      { id:'N3', name:'Wastewater Surveillance', oneliner:'Environmental AMR monitoring.',
+        mechanism:'Sampling of sewage, effluent, and surface water for AMR genes and organisms.',
+        evidence:'emerging', impact:'Early-warning for community AMR trends; surveillance layer.',
+        settings:['Public health'] },
+      { id:'N4', name:'Cross-Sector Surveillance', oneliner:'Integrated human-animal-environment reporting.',
+        mechanism:'Integrated reporting across human (ESPAUR), animal (VARSS), and environmental surveillance.',
+        evidence:'mod', impact:'Enables One Health risk assessment.',
+        settings:['National'] }
+    ]
+  },
+  {
+    id: 'O', name: 'Education & Awareness', tag: 'Sustained culture change',
+    description: 'Clinician, patient and public education as an AMS foundation.',
+    strategies: [
+      { id:'O1', name:'Clinician Education', oneliner:'CME, ward teaching, case-based.',
+        mechanism:'Structured teaching sessions, AMS-integrated induction, bedside case-based learning.',
+        evidence:'mod', impact:'Necessary but insufficient alone; amplifies structural interventions.',
+        settings:['All settings'] },
+      { id:'O2', name:'Patient & Public Education', oneliner:'Leaflets, campaigns, school programmes.',
+        mechanism:'Public-facing campaigns, TARGET leaflets, school education (e.g. e-Bug), media campaigns.',
+        evidence:'mod', impact:'Slow population-level effect; foundational for demand-side change.',
+        settings:['Public'] },
+      { id:'O3', name:'WAAW / EAAD Campaigns', oneliner:'Annual awareness weeks.',
+        mechanism:'Coordinated national and international annual campaigns (November).',
+        evidence:'low', impact:'Awareness uplift; effect on prescribing is modest without accompanying structural interventions.',
+        settings:['Global'] },
+      { id:'O4', name:'Curriculum Embedding', oneliner:'AMS in undergraduate and postgraduate training.',
+        mechanism:'Structured AMS content in medical, nursing, pharmacy, dental, and allied health curricula.',
+        evidence:'mod', impact:'Long-lead, high-durability change in prescribing culture.',
+        settings:['Education systems'] }
+    ]
+  },
+  {
+    id: 'P', name: 'Emerging & Active-Research', tag: 'Pre-adoption',
+    description: 'Strategies with significant interest but not yet standard-of-care. Include with clear "emerging" labelling.',
+    strategies: [
+      { id:'P1', name:'ML Triage for Stewardship Review', oneliner:'Automated case-finding for AMS workload.',
+        mechanism:'ML models flag highest-value cases (likely de-escalation candidates, probable contamination, LOS outliers) for AMS review.',
+        evidence:'emerging', impact:'Promising for AMS workload prioritisation; implementation heterogeneous.',
+        settings:['Research / advanced services'],
+        caveat:'Limited external validation; model-drift and fairness concerns.' },
+      { id:'P2', name:'LLM-Assisted Prescribing Audit', oneliner:'Large language models for case review.',
+        mechanism:'LLMs assist audit of prescribing notes against guidelines; flag deviations for human review.',
+        evidence:'emerging', impact:'Unknown. Known failure modes include schema entrainment, sycophancy, and propagated classification error.',
+        settings:['Research only'],
+        caveat:'Pre-adoption. Failure modes documented. Must not be deployed without SOP-led validation (see ESGAID work on LLM failure modes).' },
+      { id:'P3', name:'Phage Stewardship', oneliner:'Phage-susceptibility-guided therapy governance.',
+        mechanism:'Stewardship frameworks for compassionate and trial-context phage use.',
+        evidence:'emerging', impact:'Conceptually important; clinical use remains bespoke.',
+        settings:['Specialist centres only'] },
+      { id:'P4', name:'Novel-Agent Stewardship-by-Design', oneliner:'Build stewardship rules before release.',
+        mechanism:'Pre-launch indication fencing and sequencing rules for novel agents (e.g. cefiderocol, ceftazidime-avibactam, subscription-model products).',
+        evidence:'emerging', impact:'Governance aspiration; no outcome data yet.',
+        settings:['System-level'],
+        caveat:'Policy aspiration, not evidence-based intervention.' },
+      { id:'P5', name:'Microbiome-Preservation-Informed Prescribing', oneliner:'Choose agents with lower collateral impact.',
+        mechanism:'Select narrow-spectrum agents or novel microbiome-sparing options (e.g. ibezapolstat for CDI).',
+        evidence:'emerging', impact:'Conceptually attractive; real-world AMS effect unproven.',
+        settings:['Research'] }
+    ]
+  },
+  {
+    id: 'Q', name: 'Cross-Cutting Foundations', tag: 'Under-claimed AMS',
+    description: 'Interventions that prevent infection or enable stopping — rarely branded as AMS but among the highest-yield levers.',
+    strategies: [
+      { id:'Q1', name:'Source Control as Stewardship', oneliner:'Drain, remove, debride — the best shortener of courses.',
+        mechanism:'Timely source control (abscess drainage, line removal, device exchange, debridement) shortens required antimicrobial duration.',
+        evidence:'high', impact:'Arguably the highest-yield "stewardship" intervention — uncontrolled source drives unnecessary prolongation.',
+        settings:['Surgical','ICU','Complex infection'] },
+      { id:'Q2', name:'Vaccination as Stewardship', oneliner:'Prevent the infection, avoid the prescription.',
+        mechanism:'Pneumococcal, influenza, RSV, rotavirus, typhoid conjugate, HPV — all reduce antibiotic-exposed illness episodes.',
+        evidence:'high', impact:'Modelled substantial population-level antibiotic reductions; often omitted from AMS lists.',
+        settings:['All settings'] },
+      { id:'Q3', name:'IPC as Stewardship', oneliner:'CLABSI/CAUTI/SSI bundles reduce the denominator.',
+        mechanism:'Hand hygiene, catheter bundles, SSI bundles, isolation — prevent HAIs that drive broad-spectrum use.',
+        evidence:'high', impact:'Fewer HAIs = fewer broad-spectrum starts. IPC and AMS are complementary pillars.',
+        settings:['All hospital'] },
+      { id:'Q4', name:'Point-of-Care Testing', oneliner:'CRP POCT, strep A POCT, influenza POCT.',
+        mechanism:'Rapid POCT in primary care shifts prescribing decisions away from empirical-by-default.',
+        evidence:'high', impact:'Well-evidenced in LRTI; variable uptake.',
+        settings:['Primary care'] },
+      { id:'Q5', name:'Prophylaxis Review Cycles', oneliner:'PJP, SBP, neutropenic, splenectomy.',
+        mechanism:'Scheduled review of chronic prophylaxis regimens — stop when no longer indicated.',
+        evidence:'mod', impact:'Addresses long-duration, low-visibility prescribing.',
+        settings:['Haematology','Hepatology','Post-splenectomy'] },
+      { id:'Q6', name:'Antibiotic Amnesty / Disposal', oneliner:'Return unused antibiotics.',
+        mechanism:'Public campaigns and pharmacy take-back schemes for unused antimicrobials.',
+        evidence:'low', impact:'Addresses hoarding and self-prescription; modest direct effect.',
+        settings:['Community pharmacy'] },
+      { id:'Q7', name:'Supply-Chain & Procurement Stewardship', oneliner:'Central purchasing enforces formulary.',
+        mechanism:'Hospital and national procurement aligned with formulary restrictions; stockout management.',
+        evidence:'low', impact:'Critical in LMIC contexts; often overlooked.',
+        settings:['All systems, especially LMIC'] }
+    ]
+  }
+];
+
+// Flatten for search
+const ALL_STRATEGIES = FAMILIES.flatMap(f => f.strategies.map(s => ({...s, familyId:f.id, familyName:f.name})));
+
+// ============================================================
+// RENDER ATLAS
+// ============================================================
+
+function renderFamilies(filter='') {
+  const grid = document.getElementById('family-grid');
+  const filtered = FAMILIES.map(f => {
+    const matching = filter
+      ? f.strategies.filter(s =>
+          s.name.toLowerCase().includes(filter.toLowerCase()) ||
+          s.oneliner.toLowerCase().includes(filter.toLowerCase()) ||
+          f.name.toLowerCase().includes(filter.toLowerCase())
+        )
+      : f.strategies;
+    return {...f, matchCount: matching.length};
+  }).filter(f => !filter || f.matchCount > 0);
+
+  grid.innerHTML = filtered.map(f => `
+    <div class="family-card" data-family="${f.id}">
+      <div>
+        <div class="family-tag">§ ${f.tag}</div>
+        <div class="family-name">${f.name}</div>
+      </div>
+      <div>
+        <div class="family-meta"><span class="count">${f.matchCount}</span> / ${f.strategies.length} strategies</div>
+      </div>
+      <div class="family-letter">${f.id}</div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.family-card').forEach(el => {
+    el.addEventListener('click', () => openFamily(el.dataset.family));
+  });
+}
+
+function openFamily(id) {
+  const fam = FAMILIES.find(f => f.id === id);
+  document.getElementById('atlas-home').style.display = 'none';
+  document.getElementById('subtopic-view').classList.add('active');
+
+  document.getElementById('family-letter').textContent = fam.id;
+  document.getElementById('family-name').textContent = fam.name;
+  document.getElementById('family-desc').textContent = fam.description;
+
+  const list = document.getElementById('strategy-list');
+  list.innerHTML = fam.strategies.map(s => `
+    <div class="strategy-card" data-strategy="${s.id}">
+      <div class="strategy-tag">§ ${s.id}</div>
+      <div class="strategy-name">${s.name}</div>
+      <div class="strategy-footer">
+        <span><span class="evidence-dot evidence-${s.evidence}"></span>${evidenceLabel(s.evidence)}</span>
+        <span>${s.settings[0] || ''}</span>
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.strategy-card').forEach(el => {
+    el.addEventListener('click', () => openDetail(el.dataset.strategy));
+  });
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function evidenceLabel(tier) {
+  return {high:'High', mod:'Moderate', low:'Limited', emerging:'Emerging'}[tier];
+}
+
+document.getElementById('crumb-back').addEventListener('click', () => {
+  document.getElementById('subtopic-view').classList.remove('active');
+  document.getElementById('atlas-home').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+// ============================================================
+// DETAIL MODAL
+// ============================================================
+
+function openDetail(id) {
+  const s = ALL_STRATEGIES.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('m-tag').textContent = `§ ${s.familyName} · ${s.id}`;
+  document.getElementById('m-title').textContent = s.name;
+  document.getElementById('m-oneliner').textContent = s.oneliner;
+  document.getElementById('m-mechanism').innerHTML = `<p>${s.mechanism}</p>`;
+
+  const evBadge = document.getElementById('m-evidence');
+  evBadge.textContent = evidenceLabel(s.evidence) + ' evidence';
+  evBadge.className = 'evidence-badge ' + s.evidence;
+
+  document.getElementById('m-impact').innerHTML = `<p>${s.impact}</p>`;
+  document.getElementById('m-settings').innerHTML = s.settings.map(set => `<span class="setting-pill">${set}</span>`).join('');
+
+  const caveatBlock = document.getElementById('m-caveat-block');
+  if (s.caveat) {
+    caveatBlock.style.display = 'block';
+    document.getElementById('m-caveat').textContent = s.caveat;
+  } else {
+    caveatBlock.style.display = 'none';
+  }
+
+  document.getElementById('modal-backdrop').classList.add('active');
+}
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('modal-backdrop').classList.remove('active');
+});
+document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-backdrop') {
+    document.getElementById('modal-backdrop').classList.remove('active');
+  }
+});
+
+// ============================================================
+// SEARCH
+// ============================================================
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+  renderFamilies(e.target.value);
+});
+
+// ============================================================
+// TAB NAV
+// ============================================================
+
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    const tab = t.dataset.tab;
+    document.getElementById('view-atlas').style.display = tab === 'atlas' ? 'block' : 'none';
+    document.getElementById('view-match').classList.toggle('active', tab === 'match');
+    document.getElementById('view-about').style.display = tab === 'about' ? 'block' : 'none';
+  });
+});
+
+// ============================================================
+// HOSPITAL MATCH ENGINE
+// Rule-based, transparent, auditable
+// ============================================================
+
+const PROFILE_OPTIONS = {
+  setting: [
+    {v:'tertiary',      label:'Tertiary academic'},
+    {v:'dgh',           label:'District general'},
+    {v:'community',     label:'Community hospital'},
+    {v:'primary',       label:'Primary care'},
+    {v:'ltcf',          label:'LTCF / nursing home'},
+    {v:'lmic',          label:'Low-resource setting'},
+    {v:'specialist',    label:'Specialist centre'}
+  ],
+  specialty: [
+    {v:'icu',           label:'ICU-heavy'},
+    {v:'haem',          label:'Haematology/oncology'},
+    {v:'surgical',      label:'Surgical-heavy'},
+    {v:'neonatal',      label:'Neonatal'},
+    {v:'ed',            label:'High ED volume'},
+    {v:'transplant',    label:'Transplant'},
+    {v:'elderly',       label:'Elderly care dominant'}
+  ],
+  maturity: [
+    {v:'foundation',    label:'Foundation (no AMS team)'},
+    {v:'developing',    label:'Developing (some elements)'},
+    {v:'established',   label:'Established (full team)'},
+    {v:'advanced',      label:'Advanced (digital-integrated)'}
+  ],
+  challenge: [
+    {v:'cdi',           label:'High CDI rates'},
+    {v:'cpe',           label:'CPE / MDR-GN pressure'},
+    {v:'mrsa',          label:'MRSA burden'},
+    {v:'bsi',           label:'Bloodstream infections'},
+    {v:'overprescribe', label:'Overall overprescribing'},
+    {v:'allergy',       label:'High penicillin-allergy labelling'},
+    {v:'discharge',     label:'Long discharge tails'},
+    {v:'asb',           label:'ASB overtreatment'}
+  ],
+  resource: [
+    {v:'ehr',           label:'Full EHR / CPOE'},
+    {v:'paper',         label:'Paper prescribing'},
+    {v:'id_consultant', label:'ID consultant on site'},
+    {v:'ams_pharmacist',label:'AMS pharmacist'},
+    {v:'rapid_dx',      label:'Rapid diagnostics (MALDI, PCR)'},
+    {v:'pct',           label:'PCT available'},
+    {v:'crp_poct',      label:'CRP POCT'},
+    {v:'dashboard',     label:'AMS dashboard'}
+  ]
+};
+
+function renderOptions() {
+  Object.entries(PROFILE_OPTIONS).forEach(([key, opts]) => {
+    const container = document.getElementById('opt-' + key);
+    container.innerHTML = opts.map(o => `
+      <button type="button" class="option-chip" data-group="${key}" data-value="${o.v}">${o.label}</button>
+    `).join('');
+  });
+
+  document.querySelectorAll('.option-chip').forEach(c => {
+    c.addEventListener('click', () => {
+      const group = c.dataset.group;
+      // maturity is single-select
+      if (group === 'maturity') {
+        document.querySelectorAll(`[data-group="maturity"]`).forEach(x => x.classList.remove('selected'));
+      }
+      c.classList.toggle('selected');
+    });
+  });
+}
+renderOptions();
+
+function collectProfile() {
+  const profile = {};
+  Object.keys(PROFILE_OPTIONS).forEach(k => {
+    profile[k] = [...document.querySelectorAll(`[data-group="${k}"].selected`)].map(e => e.dataset.value);
+  });
+  profile.freetext = document.getElementById('free-context').value.toLowerCase();
+  return profile;
+}
+
+// Scoring rules: each strategy gets scored against profile
+// Returns {score, reasons:[]}
+function scoreStrategy(s, p) {
+  let score = 50; // baseline
+  const reasons = [];
+
+  const has = (group, val) => p[group] && p[group].includes(val);
+  const text = p.freetext;
+
+  // === BOOST by setting ===
+  if (has('setting','primary')) {
+    if (['D2','E3','H1','H2','H3','H4','H5','H6','K7','K9','Q4'].includes(s.id)) { score += 30; reasons.push('Primary-care priority'); }
+    if (['B1','A11','C1'].includes(s.id)) { score -= 25; reasons.push('Less applicable in primary care'); }
+  }
+  if (has('setting','tertiary') || has('setting','specialist')) {
+    if (['B1','A9','C1','L1','J3','J4','K1','P3','P4'].includes(s.id)) { score += 25; reasons.push('Fits tertiary/complex service'); }
+  }
+  if (has('setting','dgh')) {
+    if (['A1','A2','A5','A6','A7','F3','F6','I1','I3'].includes(s.id)) { score += 20; reasons.push('High-yield DGH intervention'); }
+  }
+  if (has('setting','ltcf')) {
+    if (['E1','K5','H5','O2','Q5'].includes(s.id)) { score += 35; reasons.push('LTCF priority'); }
+    if (['A9','C1','B1','K1'].includes(s.id)) { score -= 30; reasons.push('Low LTCF relevance'); }
+  }
+  if (has('setting','lmic')) {
+    if (['K10','O1','O2','M4','Q7','N2','F1','F3'].includes(s.id)) { score += 30; reasons.push('LMIC-suitable'); }
+    if (['C1','G1','G2','P1','P2','A9'].includes(s.id)) { score -= 25; reasons.push('Resource-dependent — low LMIC feasibility'); }
+  }
+
+  // === BOOST by specialty mix ===
+  if (has('specialty','icu')) {
+    if (['A8','A9','D1','K1','C1','C2','Q1'].includes(s.id)) { score += 25; reasons.push('ICU-critical'); }
+  }
+  if (has('specialty','haem')) {
+    if (['L1','L2','A9','Q5'].includes(s.id)) { score += 30; reasons.push('Haematology-critical (AFS, TDM)'); }
+  }
+  if (has('specialty','surgical')) {
+    if (['A11','K3','J5','Q1','Q3'].includes(s.id)) { score += 25; reasons.push('Surgical priority'); }
+  }
+  if (has('specialty','neonatal')) {
+    if (['C8','K4'].includes(s.id)) { score += 35; reasons.push('Neonatal priority'); }
+  }
+  if (has('specialty','ed')) {
+    if (['K2','H4','C7','Q4','A10'].includes(s.id)) { score += 20; reasons.push('ED priority'); }
+  }
+  if (has('specialty','transplant')) {
+    if (['L1','L2','A9'].includes(s.id)) { score += 25; reasons.push('Transplant-relevant'); }
+  }
+  if (has('specialty','elderly')) {
+    if (['E1','K5','I1','I2'].includes(s.id)) { score += 25; reasons.push('Elderly-care priority'); }
+  }
+
+  // === MATURITY gating ===
+  if (has('maturity','foundation')) {
+    if (['M1','M2','O1','F3','A1','A6','E1'].includes(s.id)) { score += 30; reasons.push('Foundation-stage priority'); }
+    if (['P1','P2','G8','B3','C9'].includes(s.id)) { score -= 35; reasons.push('Requires higher AMS maturity'); }
+  }
+  if (has('maturity','developing')) {
+    if (['A3','A4','A5','A6','B1','F1','F6','G6','H1','H4'].includes(s.id)) { score += 20; reasons.push('Fits developing programme'); }
+    if (['P1','P2','C9'].includes(s.id)) { score -= 20; reasons.push('Too early-stage for current maturity'); }
+  }
+  if (has('maturity','advanced')) {
+    if (['G1','G2','G3','G4','G7','P1','P2','F8','C1'].includes(s.id)) { score += 25; reasons.push('Leverages advanced infrastructure'); }
+  }
+
+  // === CHALLENGE matching ===
+  if (has('challenge','cdi')) {
+    if (['A5','A6','C5','E1','P5','Q5'].includes(s.id)) { score += 25; reasons.push('Targets CDI driver'); }
+  }
+  if (has('challenge','cpe')) {
+    if (['B4','F4','F5','F8','M6','N2'].includes(s.id)) { score += 25; reasons.push('CPE-focused'); }
+  }
+  if (has('challenge','mrsa')) {
+    if (['C7','J1','J3','J5'].includes(s.id)) { score += 25; reasons.push('Reduces MRSA-driver exposures'); }
+  }
+  if (has('challenge','bsi')) {
+    if (['C1','C6','F9','Q1'].includes(s.id)) { score += 25; reasons.push('BSI-focused'); }
+  }
+  if (has('challenge','overprescribe')) {
+    if (['A6','H2','H1','H3','G4','D2'].includes(s.id)) { score += 25; reasons.push('Addresses overall overprescribing'); }
+  }
+  if (has('challenge','allergy')) {
+    if (['J1','J2','J3','J4','J5'].includes(s.id)) { score += 35; reasons.push('Allergy de-labelling priority'); }
+  }
+  if (has('challenge','discharge')) {
+    if (['I1','I2','I3','I4','I5'].includes(s.id)) { score += 30; reasons.push('Targets discharge tail'); }
+  }
+  if (has('challenge','asb')) {
+    if (['C3','E1','K5'].includes(s.id)) { score += 35; reasons.push('ASB-targeted'); }
+  }
+
+  // === RESOURCE gating ===
+  if (has('resource','paper') && !has('resource','ehr')) {
+    if (['G1','G2','G3','G4','G5','G6','G7','F8'].includes(s.id)) { score -= 40; reasons.push('Needs EHR — unavailable'); }
+    if (['F3','O1','H3','H4'].includes(s.id)) { score += 10; reasons.push('Paper-compatible'); }
+  }
+  if (has('resource','ehr')) {
+    if (['G1','G2','G3','G4','G5','G6','G7','F8'].includes(s.id)) { score += 15; reasons.push('EHR-enabled'); }
+  }
+  if (!has('resource','rapid_dx')) {
+    if (['C1','C7'].includes(s.id)) { score -= 25; reasons.push('Requires rapid diagnostics'); }
+  } else {
+    if (['C1','C7'].includes(s.id)) { score += 20; reasons.push('Rapid-dx enabled'); }
+  }
+  if (!has('resource','pct')) {
+    if (['D1'].includes(s.id)) { score -= 30; reasons.push('PCT unavailable'); }
+  } else {
+    if (['D1'].includes(s.id)) { score += 25; reasons.push('PCT-enabled'); }
+  }
+  if (!has('resource','crp_poct')) {
+    if (['D2'].includes(s.id)) { score -= 15; reasons.push('CRP POCT unavailable (primary care)'); }
+  }
+  if (!has('resource','ams_pharmacist') && !has('resource','id_consultant')) {
+    if (['A3','A4','B1','L1'].includes(s.id)) { score -= 20; reasons.push('Requires AMS/ID workforce'); }
+  }
+  if (has('resource','dashboard')) {
+    if (['G7','G8','M4','M7'].includes(s.id)) { score += 15; reasons.push('Dashboard available'); }
+  }
+
+  // === FREE TEXT fuzzy matches ===
+  if (text) {
+    if (text.includes('surg') && ['A11','K3','Q1'].includes(s.id)) { score += 15; reasons.push('Mentioned surgical context'); }
+    if (text.includes('fung') && ['L1'].includes(s.id)) { score += 20; reasons.push('Mentioned fungal'); }
+    if (text.includes('neonat') && ['C8','K4'].includes(s.id)) { score += 20; reasons.push('Mentioned neonatal'); }
+    if ((text.includes('rural') || text.includes('remote') || text.includes('low resource')) && ['K10','Q7'].includes(s.id)) { score += 20; reasons.push('Resource-limited context'); }
+    if (text.includes('dental') && ['K8'].includes(s.id)) { score += 25; reasons.push('Mentioned dental'); }
+    if ((text.includes('pharmacy') || text.includes('pharmacy first')) && ['K9'].includes(s.id)) { score += 20; reasons.push('Pharmacy-led model'); }
+    if ((text.includes('sepsis')) && ['A5','A10','D1','Q1'].includes(s.id)) { score += 15; reasons.push('Sepsis-relevant'); }
+  }
+
+  // === FOUNDATIONAL always score high unless contraindicated ===
+  if (['M1','M2'].includes(s.id) && !has('maturity','advanced') && !has('maturity','established')) {
+    score += 10; reasons.push('Programmatic foundation');
+  }
+
+  // Clamp and dedupe
+  score = Math.max(0, Math.min(100, score));
+  const uniqueReasons = [...new Set(reasons)];
+  return {score, reasons: uniqueReasons};
+}
+
+function assignGrade(score) {
+  if (score >= 80) return 'A';
+  if (score >= 65) return 'B';
+  if (score >= 50) return 'C';
+  return null; // excluded
+}
+
+document.getElementById('analyze-btn').addEventListener('click', () => {
+  const profile = collectProfile();
+
+  const scored = ALL_STRATEGIES.map(s => {
+    const {score, reasons} = scoreStrategy(s, profile);
+    return {...s, score, reasons, grade: assignGrade(score)};
+  }).filter(x => x.grade !== null)
+    .sort((a,b) => b.score - a.score);
+
+  const byGrade = {A:[], B:[], C:[]};
+  scored.forEach(x => byGrade[x.grade].push(x));
+
+  const results = document.getElementById('results-section');
+  const list = document.getElementById('results-list');
+  results.classList.add('active');
+
+  const profileSummary = [];
+  if (profile.setting.length) profileSummary.push(profile.setting.map(v => PROFILE_OPTIONS.setting.find(o=>o.v===v).label).join(' + '));
+  if (profile.maturity.length) profileSummary.push(PROFILE_OPTIONS.maturity.find(o=>o.v===profile.maturity[0])?.label);
+  document.getElementById('results-sub').textContent = profileSummary.join(' · ') || 'Unspecified profile';
+
+  let html = '';
+  [
+    {grade:'A', label:'Priority — high fit, high impact', klass:'a'},
+    {grade:'B', label:'High value — consider implementing next', klass:'b'},
+    {grade:'C', label:'Worth considering — context-dependent', klass:'c'}
+  ].forEach(({grade, label, klass}) => {
+    const items = byGrade[grade];
+    if (!items.length) return;
+    html += `
+      <div class="grade-section">
+        <div class="grade-header ${klass}">
+          <span>Grade ${grade} — ${label}</span>
+          <span class="grade-count">${items.length} strategies</span>
+        </div>
+        ${items.map(x => `
+          <div class="match-card" data-strategy="${x.id}">
+            <div class="match-score">${x.score}</div>
+            <div class="match-info">
+              <div class="match-name">${x.name}</div>
+              <div class="match-reason">${x.reasons.slice(0,3).join(' · ') || 'Baseline fit'}</div>
+            </div>
+            <div class="match-meta">${x.familyId} · ${evidenceLabel(x.evidence)}</div>
+          </div>
+        `).join('')}
+      </div>`;
+  });
+
+  if (!html) html = '<p style="font-family:Fraunces,serif; font-style:italic; color:var(--slate);">No strategies matched — try selecting at least a setting and maturity level.</p>';
+
+  list.innerHTML = html;
+  document.querySelectorAll('#results-list .match-card').forEach(el => {
+    el.addEventListener('click', () => openDetail(el.dataset.strategy));
+  });
+
+  // Trigger LLM narrative for top strategies
+  generateNarrative(profile, byGrade.A.slice(0, 8), byGrade.B.slice(0, 4));
+
+  results.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+// ============================================================
+// LLM NARRATIVE LAYER
+// ============================================================
+
+async function generateNarrative(profile, topA, topB) {
+  const panel = document.getElementById('narrative-content');
+  panel.innerHTML = '<div class="narrative-loading">Generating contextual narrative</div>';
+
+  // Build a compact profile description
+  const labelFor = (group, val) => {
+    const opt = PROFILE_OPTIONS[group]?.find(o => o.v === val);
+    return opt ? opt.label : val;
+  };
+  const describe = (group) => profile[group].map(v => labelFor(group, v)).join(', ') || 'not specified';
+
+  const profileText = `
+Setting: ${describe('setting')}
+Specialty mix: ${describe('specialty')}
+AMS maturity: ${describe('maturity')}
+Known challenges: ${describe('challenge')}
+Resources: ${describe('resource')}
+Additional context: ${profile.freetext || 'none'}
+`.trim();
+
+  const topStrategiesText = [
+    ...topA.map(s => `[A/${s.score}] ${s.name} (${s.familyName}) — ${s.oneliner}`),
+    ...topB.map(s => `[B/${s.score}] ${s.name} (${s.familyName}) — ${s.oneliner}`)
+  ].join('\n');
+
+  const prompt = `You are writing a short contextual narrative for an antimicrobial stewardship (AMS) educational dashboard. A rule-based engine has already scored and graded strategies against a hospital profile. Your job is to write a brief, specific narrative (150-220 words, 2-3 short paragraphs) explaining WHY the top-ranked strategies fit this particular setting, and what sequencing or dependencies matter.
+
+Hospital profile:
+${profileText}
+
+Top-ranked strategies (already scored by the rule engine):
+${topStrategiesText}
+
+Requirements:
+- Be specific to the profile above, not generic
+- Identify 2-3 themes connecting the top strategies
+- Mention dependencies or sequencing where relevant (e.g. "M2 must precede G-family interventions because...")
+- If the profile reveals a specific risk or gap, name it
+- Use British English
+- Use <strong> tags (not markdown) for emphasis on strategy names or key concepts
+- Wrap paragraphs in <p> tags
+- Do not repeat the strategy list verbatim
+- Do not add disclaimers — they are handled elsewhere
+- Do not use bullet points or headers
+
+Output the narrative HTML only, nothing else.`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    if (!response.ok) throw new Error(`API returned ${response.status}`);
+    const data = await response.json();
+
+    const text = data.content
+      .filter(item => item.type === "text")
+      .map(item => item.text)
+      .join("\n")
+      .trim();
+
+    if (!text) throw new Error("Empty response");
+
+    // Clean any stray markdown fences
+    const clean = text.replace(/```html|```/g, "").trim();
+    panel.innerHTML = clean;
+  } catch (err) {
+    panel.innerHTML = `<div class="narrative-error">Narrative generation unavailable (${err.message}). Rule-based scores above are unaffected. Review them with an AMS expert.</div>`;
+  }
+}
+
+// ============================================================
+// INITIAL RENDER
+// ============================================================
+
+renderFamilies();
+
+</script>
+</body>
+</html>
